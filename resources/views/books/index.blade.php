@@ -37,6 +37,15 @@
             background-color: #b02a37;
         }
 
+        .menu {
+            margin-bottom: 20px;
+        }
+
+        .menu a {
+            display: inline-block;
+            margin-right: 10px;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -69,6 +78,18 @@
             @csrf
             <button type="submit" class="logout-button">Logout</button>
         </form>
+    </div>
+
+    <div class="menu">
+        <a href="{{ url('/dashboard') }}">Dashboard</a>
+
+        <a href="{{ route('categories.index') }}">Kategori</a>
+
+        <a href="{{ route('members.index') }}">Anggota</a>
+
+        @can('manage-users')
+            <a href="{{ route('users.index') }}">Kelola Pengguna</a>
+        @endcan
     </div>
 
     @if (session('success'))

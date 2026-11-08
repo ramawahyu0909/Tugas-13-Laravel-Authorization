@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Book;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class BookController extends Controller
 {
@@ -45,6 +46,8 @@ class BookController extends Controller
 
     public function index()
     {
+        Gate::authorize('viewAny', Book::class);
+
         $books = Book::with('category')->get();
 
         return view('books.index', compact('books'));
@@ -52,6 +55,8 @@ class BookController extends Controller
 
     public function create()
     {
+        Gate::authorize('create', Book::class);
+
         $title = 'Tambah Buku';
         $categories = Category::orderBy('name')->get();
 
@@ -60,6 +65,8 @@ class BookController extends Controller
 
     public function store(Request $request)
     {
+        Gate::authorize('create', Book::class);
+
         $validated = $request->validate(
             $this->rules(),
             $this->messages()
@@ -76,12 +83,17 @@ class BookController extends Controller
     {
         $book = Book::with('category')->findOrFail($id);
 
+        Gate::authorize('view', $book);
+
         return view('books.show', compact('book'));
     }
 
     public function edit($id)
     {
         $book = Book::findOrFail($id);
+
+        Gate::authorize('update', $book);
+
         $categories = Category::orderBy('name')->get();
 
         return view('books.edit', compact('book', 'categories'));
@@ -89,12 +101,15 @@ class BookController extends Controller
 
     public function update(Request $request, $id)
     {
+        $book = Book::findOrFail($id);
+
+        Gate::authorize('update', $book);
+
         $validated = $request->validate(
             $this->rules(),
             $this->messages()
         );
 
-        $book = Book::findOrFail($id);
         $book->update($validated);
 
         return redirect()
@@ -105,6 +120,9 @@ class BookController extends Controller
     public function destroy($id)
     {
         $book = Book::findOrFail($id);
+
+        Gate::authorize('delete', $book);
+
         $book->delete();
 
         return redirect()
